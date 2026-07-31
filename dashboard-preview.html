@@ -1,0 +1,943 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SwiftPay — Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root {
+  --color-primary: #7CFC00;
+  --color-primary-dark: #3D5A00;
+  --color-primary-light: #A8E600;
+  --color-bg: #0A0A0A;
+  --color-surface: #111111;
+  --color-surface-elevated: #1A1A1A;
+  --color-surface-glass: rgba(255,255,255,0.03);
+  --color-text: #FFFFFF;
+  --color-text-secondary: #8A8A8A;
+  --color-success: #7CFC00;
+  --color-error: #FF3B3B;
+  --color-warning: #FFB800;
+  --radius: 16px;
+  --radius-sm: 12px;
+  --radius-xs: 8px;
+  --space-xs: 4px;
+  --space-sm: 8px;
+  --space-md: 16px;
+  --space-lg: 24px;
+  --space-xl: 32px;
+  --font-body: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.4);
+  --shadow-md: 0 4px 16px rgba(0,0,0,0.5);
+  --shadow-glow: 0 0 30px rgba(124,252,0,0.08);
+  --shadow-glow-strong: 0 0 40px rgba(124,252,0,0.15);
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: var(--font-body);
+  background: var(--color-bg);
+  color: var(--color-text);
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.topbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 64px;
+  background: rgba(10,10,10,0.85);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid rgba(255,255,255,0.04);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 var(--space-xl);
+  z-index: 100;
+}
+
+.topbar-left {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+}
+
+.topbar-logo {
+  font-size: 20px;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+  background: linear-gradient(135deg, var(--color-primary), var(--color-primary-light));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.topbar-search {
+  background: var(--color-surface);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: var(--radius-xs);
+  padding: 8px 16px;
+  color: var(--color-text);
+  font-family: var(--font-body);
+  font-size: 13px;
+  width: 260px;
+  outline: none;
+  transition: border-color 0.2s ease;
+}
+
+.topbar-search:focus {
+  border-color: rgba(124,252,0,0.3);
+}
+
+.topbar-search::placeholder {
+  color: var(--color-text-secondary);
+}
+
+.topbar-right {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+}
+
+.topbar-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--color-surface);
+  border: 1px solid rgba(255,255,255,0.06);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+}
+
+.topbar-icon:hover {
+  border-color: rgba(124,252,0,0.3);
+  box-shadow: var(--shadow-glow);
+}
+
+.topbar-icon svg {
+  width: 18px;
+  height: 18px;
+  stroke: var(--color-text-secondary);
+  fill: none;
+  stroke-width: 1.5;
+}
+
+.topbar-icon .badge {
+  position: absolute;
+  top: -2px;
+  right: -2px;
+  width: 8px;
+  height: 8px;
+  background: var(--color-primary);
+  border-radius: 50%;
+  box-shadow: 0 0 8px rgba(124,252,0,0.5);
+}
+
+.topbar-avatar {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--color-primary-dark), var(--color-primary));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  font-weight: 700;
+  color: #000;
+  cursor: pointer;
+}
+
+.main {
+  margin-top: 64px;
+  padding: var(--space-xl) var(--space-xl) calc(var(--space-xl) + 80px);
+  max-width: 1200px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.greeting {
+  font-size: 28px;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+  margin-bottom: var(--space-xs);
+}
+
+.greeting span {
+  background: linear-gradient(135deg, var(--color-primary), var(--color-primary-light));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.greeting-sub {
+  font-size: 14px;
+  color: var(--color-text-secondary);
+  margin-bottom: var(--space-xl);
+}
+
+.balance-card {
+  background: linear-gradient(135deg, rgba(124,252,0,0.08) 0%, rgba(124,252,0,0.02) 100%);
+  border: 1px solid rgba(124,252,0,0.15);
+  border-radius: var(--radius);
+  padding: var(--space-xl);
+  margin-bottom: var(--space-xl);
+  position: relative;
+  overflow: hidden;
+}
+
+.balance-card::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  right: -20%;
+  width: 300px;
+  height: 300px;
+  background: radial-gradient(circle, rgba(124,252,0,0.08) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.balance-label {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--color-text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: var(--space-sm);
+}
+
+.balance-value {
+  font-size: 42px;
+  font-weight: 800;
+  letter-spacing: -1px;
+  position: relative;
+}
+
+.balance-value .currency {
+  font-size: 24px;
+  font-weight: 600;
+  opacity: 0.6;
+}
+
+.balance-change {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-success);
+  background: rgba(124,252,0,0.1);
+  padding: 3px 10px;
+  border-radius: 20px;
+  margin-top: var(--space-sm);
+  position: relative;
+}
+
+.balance-actions {
+  display: flex;
+  gap: var(--space-sm);
+  margin-top: var(--space-lg);
+  position: relative;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-sm);
+  padding: 12px 24px;
+  border-radius: var(--radius-xs);
+  font-family: var(--font-body);
+  font-size: 14px;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-decoration: none;
+}
+
+.btn-primary {
+  background: var(--color-primary);
+  color: #000;
+  box-shadow: var(--shadow-glow);
+}
+
+.btn-primary:hover {
+  background: var(--color-primary-light);
+  box-shadow: var(--shadow-glow-strong);
+  transform: translateY(-1px);
+}
+
+.btn-secondary {
+  background: var(--color-surface);
+  color: var(--color-text);
+  border: 1px solid rgba(255,255,255,0.08);
+}
+
+.btn-secondary:hover {
+  border-color: rgba(124,252,0,0.3);
+  background: var(--color-surface-elevated);
+}
+
+.btn-icon {
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border-radius: 50%;
+  background: var(--color-surface);
+  border: 1px solid rgba(255,255,255,0.08);
+  color: var(--color-text);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-icon:hover {
+  border-color: rgba(124,252,0,0.3);
+  box-shadow: var(--shadow-glow);
+}
+
+.btn-icon svg {
+  width: 20px;
+  height: 20px;
+  stroke: currentColor;
+  fill: none;
+  stroke-width: 1.5;
+}
+
+.grid-4 {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--space-md);
+  margin-bottom: var(--space-xl);
+}
+
+.mini-card {
+  background: var(--color-surface);
+  border: 1px solid rgba(255,255,255,0.04);
+  border-radius: var(--radius-sm);
+  padding: var(--space-md);
+  transition: all 0.2s ease;
+}
+
+.mini-card:hover {
+  border-color: rgba(124,252,0,0.1);
+  box-shadow: var(--shadow-sm);
+}
+
+.mini-card-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: var(--space-sm);
+}
+
+.mini-card-value {
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: -0.3px;
+}
+
+.mini-card-sub {
+  font-size: 12px;
+  color: var(--color-text-secondary);
+  margin-top: var(--space-xs);
+}
+
+.mini-card-sub .up { color: var(--color-success); font-weight: 600; }
+.mini-card-sub .down { color: var(--color-error); font-weight: 600; }
+
+.section {
+  margin-bottom: var(--space-xl);
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--space-md);
+}
+
+.section-title {
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: -0.3px;
+}
+
+.section-link {
+  font-size: 13px;
+  color: var(--color-primary);
+  text-decoration: none;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.section-link:hover {
+  text-decoration: underline;
+}
+
+.two-col {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-md);
+  margin-bottom: var(--space-xl);
+}
+
+.full-card {
+  background: var(--color-surface);
+  border: 1px solid rgba(255,255,255,0.04);
+  border-radius: var(--radius);
+  padding: var(--space-lg);
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.table th {
+  text-align: left;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: 0 var(--space-md) var(--space-sm) 0;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+
+.table td {
+  padding: 14px var(--space-md) 14px 0;
+  font-size: 14px;
+  border-bottom: 1px solid rgba(255,255,255,0.03);
+}
+
+.table tr:last-child td {
+  border-bottom: none;
+}
+
+.table tr:hover td {
+  background: rgba(124,252,0,0.02);
+}
+
+.amount {
+  font-family: 'JetBrains Mono', 'Fira Code', monospace;
+  font-weight: 500;
+  font-size: 14px;
+}
+
+.amount.positive { color: var(--color-success); }
+.amount.negative { color: var(--color-error); }
+
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 4px 12px;
+  border-radius: 20px;
+}
+
+.pill.completed {
+  background: rgba(124,252,0,0.1);
+  color: var(--color-primary);
+}
+
+.pill.pending {
+  background: rgba(255,184,0,0.1);
+  color: var(--color-warning);
+}
+
+.pill.failed {
+  background: rgba(255,59,59,0.1);
+  color: var(--color-error);
+}
+
+.pill .dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.qr-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: var(--space-xl) 0;
+  gap: var(--space-md);
+}
+
+.qr-frame {
+  width: 200px;
+  height: 200px;
+  background: #FFFFFF;
+  border-radius: var(--radius);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  box-shadow: var(--shadow-md);
+}
+
+.qr-frame-inner {
+  width: 160px;
+  height: 160px;
+  background: #FFFFFF;
+  position: relative;
+}
+
+.qr-frame-inner::before {
+  content: '';
+  position: absolute;
+  inset: 10px;
+  border: 2px solid #000;
+  border-radius: 4px;
+}
+
+.qr-frame-inner::after {
+  content: '';
+  position: absolute;
+  width: 48px;
+  height: 48px;
+  background: #000;
+  border-radius: 4px;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.qr-amount {
+  font-size: 36px;
+  font-weight: 800;
+  letter-spacing: -1px;
+}
+
+.qr-label {
+  font-size: 13px;
+  color: var(--color-text-secondary);
+}
+
+.qr-actions {
+  display: flex;
+  gap: var(--space-sm);
+}
+
+.chart-container {
+  height: 140px;
+  display: flex;
+  align-items: flex-end;
+  gap: 4px;
+  padding-top: var(--space-md);
+}
+
+.chart-bar {
+  flex: 1;
+  background: linear-gradient(to top, var(--color-primary-dark), var(--color-primary));
+  border-radius: 4px 4px 0 0;
+  opacity: 0.6;
+  transition: all 0.2s ease;
+  min-height: 6px;
+}
+
+.chart-bar:hover {
+  opacity: 1;
+  transform: scaleY(1.02);
+  transform-origin: bottom;
+}
+
+.chart-labels {
+  display: flex;
+  justify-content: space-between;
+  margin-top: var(--space-sm);
+}
+
+.chart-labels span {
+  font-size: 11px;
+  color: var(--color-text-secondary);
+}
+
+.stat-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--space-sm) 0;
+  border-bottom: 1px solid rgba(255,255,255,0.03);
+}
+
+.stat-row:last-child {
+  border-bottom: none;
+}
+
+.stat-label {
+  font-size: 13px;
+  color: var(--color-text-secondary);
+}
+
+.stat-value {
+  font-family: 'JetBrains Mono', 'Fira Code', monospace;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.progress-track {
+  height: 6px;
+  background: var(--color-surface-elevated);
+  border-radius: 3px;
+  overflow: hidden;
+  margin-top: var(--space-sm);
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--color-primary-dark), var(--color-primary));
+  border-radius: 3px;
+  transition: width 0.3s ease;
+}
+
+.bottom-nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 64px;
+  background: rgba(10,10,10,0.9);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-top: 1px solid rgba(255,255,255,0.04);
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  z-index: 100;
+}
+
+.bottom-nav-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  cursor: pointer;
+  padding: 4px 12px;
+  transition: all 0.2s ease;
+}
+
+.bottom-nav-item svg {
+  width: 22px;
+  height: 22px;
+  stroke: var(--color-text-secondary);
+  fill: none;
+  stroke-width: 1.5;
+  transition: stroke 0.2s ease;
+}
+
+.bottom-nav-item span {
+  font-size: 10px;
+  font-weight: 500;
+  color: var(--color-text-secondary);
+  transition: color 0.2s ease;
+}
+
+.bottom-nav-item.active svg {
+  stroke: var(--color-primary);
+}
+
+.bottom-nav-item.active span {
+  color: var(--color-primary);
+}
+
+.bottom-nav-item.active::before {
+  content: '';
+  position: absolute;
+  top: -12px;
+  width: 8px;
+  height: 8px;
+  background: var(--color-primary);
+  border-radius: 50%;
+  box-shadow: 0 0 12px rgba(124,252,0,0.4);
+}
+
+.bottom-nav-item {
+  position: relative;
+}
+
+@media (max-width: 1024px) {
+  .grid-4 { grid-template-columns: repeat(2, 1fr); }
+  .two-col { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 768px) {
+  .main { padding: var(--space-lg) var(--space-lg) calc(var(--space-lg) + 80px); }
+  .grid-4 { grid-template-columns: 1fr 1fr; }
+  .topbar-search { display: none; }
+}
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="topbar-left">
+    <div class="topbar-logo">SwiftPay</div>
+    <input type="text" class="topbar-search" placeholder="Buscar transações, produtos...">
+  </div>
+  <div class="topbar-right">
+    <div class="topbar-icon">
+      <svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+      <span class="badge"></span>
+    </div>
+    <div class="topbar-icon">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+    </div>
+    <div class="topbar-avatar">MP</div>
+  </div>
+</header>
+
+<main class="main">
+  <div class="greeting">Bem-vindo, <span>Matheus</span></div>
+  <div class="greeting-sub">Aqui está um resumo do seu negócio hoje.</div>
+
+  <div class="balance-card">
+    <div class="balance-label">Saldo Disponível</div>
+    <div class="balance-value"><span class="currency">R$</span> 48.520</div>
+    <div class="balance-change">↑ 12.4% em relação ao mês anterior</div>
+    <div class="balance-actions">
+      <button class="btn btn-primary">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        Receber Pix
+      </button>
+      <button class="btn btn-secondary">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        Sacar
+      </button>
+      <button class="btn btn-icon">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="4" width="20" height="16" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
+      </button>
+    </div>
+  </div>
+
+  <div class="grid-4">
+    <div class="mini-card">
+      <div class="mini-card-label">Receitas (Mês)</div>
+      <div class="mini-card-value">R$ 127.800</div>
+      <div class="mini-card-sub"><span class="up">↑ 8.2%</span> vs mês anterior</div>
+    </div>
+    <div class="mini-card">
+      <div class="mini-card-label">Despesas (Mês)</div>
+      <div class="mini-card-value">R$ 34.200</div>
+      <div class="mini-card-sub"><span class="down">↓ 3.1%</span> vs mês anterior</div>
+    </div>
+    <div class="mini-card">
+      <div class="mini-card-label">Transações</div>
+      <div class="mini-card-value">1.247</div>
+      <div class="mini-card-sub"><span class="up">↑ 23.5%</span> vs mês anterior</div>
+    </div>
+    <div class="mini-card">
+      <div class="mini-card-label">Clientes Ativos</div>
+      <div class="mini-card-value">89</div>
+      <div class="mini-card-sub"><span class="up">↑ 5 novos</span> este mês</div>
+    </div>
+  </div>
+
+  <div class="two-col">
+    <div class="full-card">
+      <div class="section-header">
+        <div class="section-title">Receita por Dia</div>
+        <a class="section-link">Ver relatório →</a>
+      </div>
+      <div class="chart-container">
+        <div class="chart-bar" style="height:35%"></div>
+        <div class="chart-bar" style="height:55%"></div>
+        <div class="chart-bar" style="height:42%"></div>
+        <div class="chart-bar" style="height:78%"></div>
+        <div class="chart-bar" style="height:90%"></div>
+        <div class="chart-bar" style="height:65%"></div>
+        <div class="chart-bar" style="height:45%"></div>
+        <div class="chart-bar" style="height:58%"></div>
+        <div class="chart-bar" style="height:72%"></div>
+        <div class="chart-bar" style="height:40%"></div>
+        <div class="chart-bar" style="height:60%"></div>
+        <div class="chart-bar" style="height:85%"></div>
+      </div>
+      <div class="chart-labels">
+        <span>Seg</span><span>Ter</span><span>Qua</span><span>Qui</span><span>Sex</span><span>Sáb</span><span>Dom</span><span>Seg</span><span>Ter</span><span>Qua</span><span>Qui</span><span>Sex</span>
+      </div>
+    </div>
+
+    <div class="full-card">
+      <div class="section-header">
+        <div class="section-title">Ações Rápidas</div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:var(--space-sm)">
+        <button class="btn btn-primary" style="width:100%;justify-content:flex-start">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg>
+          Novo Produto
+        </button>
+        <button class="btn btn-secondary" style="width:100%;justify-content:flex-start">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+          Receber Pix
+        </button>
+        <button class="btn btn-secondary" style="width:100%;justify-content:flex-start">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+          Solicitar Saque
+        </button>
+        <button class="btn btn-secondary" style="width:100%;justify-content:flex-start">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          Ver Agendamentos
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="full-card" style="margin-bottom:var(--space-xl)">
+    <div class="section-header">
+      <div class="section-title">Transações Recentes</div>
+      <a class="section-link">Ver todas →</a>
+    </div>
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Cliente</th>
+          <th>Tipo</th>
+          <th>Método</th>
+          <th>Valor</th>
+          <th>Status</th>
+          <th>Data</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>João Silva</td>
+          <td>Receita</td>
+          <td>Pix</td>
+          <td class="amount positive">+R$ 1.250,00</td>
+          <td><span class="pill completed"><span class="dot"></span>Concluído</span></td>
+          <td style="color:var(--color-text-secondary);font-size:13px">Hoje, 14:22</td>
+        </tr>
+        <tr>
+          <td>Maria Santos</td>
+          <td>Receita</td>
+          <td>Pix</td>
+          <td class="amount positive">+R$ 890,00</td>
+          <td><span class="pill completed"><span class="dot"></span>Concluído</span></td>
+          <td style="color:var(--color-text-secondary);font-size:13px">Hoje, 11:05</td>
+        </tr>
+        <tr>
+          <td>Carlos Oliveira</td>
+          <td>Despesa</td>
+          <td>Pix</td>
+          <td class="amount negative">-R$ 3.400,00</td>
+          <td><span class="pill completed"><span class="dot"></span>Concluído</span></td>
+          <td style="color:var(--color-text-secondary);font-size:13px">Ontem, 18:30</td>
+        </tr>
+        <tr>
+          <td>Ana Costa</td>
+          <td>Receita</td>
+          <td>Pix</td>
+          <td class="amount positive">+R$ 2.100,00</td>
+          <td><span class="pill pending"><span class="dot"></span>Pendente</span></td>
+          <td style="color:var(--color-text-secondary);font-size:13px">Ontem, 09:15</td>
+        </tr>
+        <tr>
+          <td>Pedro Lima</td>
+          <td>Receita</td>
+          <td>Pix</td>
+          <td class="amount positive">+R$ 560,00</td>
+          <td><span class="pill completed"><span class="dot"></span>Concluído</span></td>
+          <td style="color:var(--color-text-secondary);font-size:13px">02/08, 16:45</td>
+        </tr>
+        <tr>
+          <td>Fernanda R.</td>
+          <td>Despesa</td>
+          <td>Pix</td>
+          <td class="amount negative">-R$ 150,00</td>
+          <td><span class="pill failed"><span class="dot"></span>Falhou</span></td>
+          <td style="color:var(--color-text-secondary);font-size:13px">01/08, 10:20</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="two-col">
+    <div class="full-card">
+      <div class="section-header">
+        <div class="section-title">QR Code Pix</div>
+      </div>
+      <div class="qr-section">
+        <div class="qr-amount">R$ 150,00</div>
+        <div class="qr-frame">
+          <div class="qr-frame-inner"></div>
+        </div>
+        <div class="qr-label">Gere um QR Code para receber Pix</div>
+        <div class="qr-actions">
+          <button class="btn btn-primary btn-sm">Gerar QR</button>
+          <button class="btn btn-secondary btn-sm">Copiar Valor</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="full-card">
+      <div class="section-header">
+        <div class="section-title">Resumo do Mês</div>
+      </div>
+      <div class="stat-row">
+        <span class="stat-label">Total Recebido</span>
+        <span class="stat-value" style="color:var(--color-success)">R$ 89.400,00</span>
+      </div>
+      <div class="stat-row">
+        <span class="stat-label">Total Enviado</span>
+        <span class="stat-value" style="color:var(--color-error)">R$ 28.600,00</span>
+      </div>
+      <div class="stat-row">
+        <span class="stat-label">Taxas OpenPix (1,5%)</span>
+        <span class="stat-value">R$ 1.341,00</span>
+      </div>
+      <div class="stat-row">
+        <span class="stat-label">Saldo Líquido</span>
+        <span class="stat-value" style="color:var(--color-primary)">R$ 59.459,00</span>
+      </div>
+      <div class="stat-row">
+        <span class="stat-label">Meta do Mês</span>
+        <span class="stat-value">78%</span>
+      </div>
+      <div class="progress-track">
+        <div class="progress-fill" style="width:78%"></div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<nav class="bottom-nav">
+  <div class="bottom-nav-item active">
+    <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+    <span>Início</span>
+  </div>
+  <div class="bottom-nav-item">
+    <svg viewBox="0 0 24 24"><rect x="2" y="4" width="20" height="16" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
+    <span>Pagamentos</span>
+  </div>
+  <div class="bottom-nav-item">
+    <svg viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+    <span>Carteira</span>
+  </div>
+  <div class="bottom-nav-item">
+    <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+    <span>Perfil</span>
+  </div>
+</nav>
+
+</body>
+</html>
