@@ -1,6 +1,6 @@
 'use client'
 
-import { DashboardLayout } from '@/components/layout/dashboard-layout'
+import DashboardLayout from '@/components/layout/dashboard-layout'
 import { StatsCard } from '@/components/dashboard/stats-card'
 import { RevenueChart } from '@/components/dashboard/revenue-chart'
 import { RecentTransactions } from '@/components/dashboard/recent-transactions'

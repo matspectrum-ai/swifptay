@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma/client'
 import { authOptions } from '@/lib/auth/config'
-import { getServerSession } from 'auth.js'
+import { getServerSession } from 'next-auth'
 
 export async function GET(request: NextRequest) {
   const session = await getServerSession(authOptions)
@@ -23,8 +23,12 @@ export async function GET(request: NextRequest) {
   if (type) where['type'] = type
   if (dateFrom || dateTo) {
     where['createdAt'] = {}
-    if (dateFrom) ;(where['createdAt'] as Record<string, unknown>)['gte'] = new Date(dateFrom)
-    if (dateTo) ;(where['createdAt'] as Record<string, unknown>)['lte'] = new Date(dateTo)
+    if (dateFrom) {
+      ;(where['createdAt'] as Record<string, unknown>)['gte'] = new Date(dateFrom)
+    }
+    if (dateTo) {
+      ;(where['createdAt'] as Record<string, unknown>)['lte'] = new Date(dateTo)
+    }
   }
 
   const [transactions, total] = await Promise.all([

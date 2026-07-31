@@ -1,37 +1,15 @@
-import { NextAuthOptions } from 'auth.js'
+import { NextAuthOptions } from 'next-auth'
 import { PrismaAdapter } from '@auth/prisma-adapter'
 import { prisma } from '../prisma/client'
+import GoogleProvider from 'next-auth/providers/google'
 
 export const authOptions: NextAuthOptions = {
   adapter: PrismaAdapter(prisma),
   providers: [
-    {
-      id: 'google',
-      name: 'Google',
-      type: 'oauth',
-      issuer: 'https://accounts.google.com',
-      authorization: {
-        url: 'https://accounts.google.com/o/oauth2/v2/auth',
-        params: {
-          scope: 'openid email profile',
-          access_type: 'offline',
-          prompt: 'consent',
-        },
-      },
-      token: 'https://oauth2.googleapis.com/token',
-      userinfo: 'https://www.googleapis.com/oauth2/v3/userinfo',
+    GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID!,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
-      checks: ['state', 'pkce'],
-      profile(profile) {
-        return {
-          id: profile.sub,
-          email: profile.email,
-          name: profile.name,
-          avatarUrl: profile.picture,
-        }
-      },
-    },
+    }),
   ],
   session: {
     strategy: 'jwt',
@@ -46,7 +24,7 @@ export const authOptions: NextAuthOptions = {
     async jwt({ token, user, account }) {
       if (user) {
         token.id = user.id
-        token.role = user.role
+        token.role = (user as { role?: string }).role || 'MERCHANT'
       }
       return token
     },

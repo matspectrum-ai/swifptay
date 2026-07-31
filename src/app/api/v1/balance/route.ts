@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma/client'
 import { authOptions } from '@/lib/auth/config'
-import { getServerSession } from 'auth.js'
+import { getServerSession } from 'next-auth'
 
 export async function GET(request: NextRequest) {
   const session = await getServerSession(authOptions)
@@ -20,13 +20,13 @@ export async function GET(request: NextRequest) {
     }),
   ])
 
-  const balance = (income._sum.amount ?? 0) - (expenses._sum.amount ?? 0)
+  const balance = Number(income._sum.amount ?? 0) - Number(expenses._sum.amount ?? 0)
 
   return NextResponse.json({
     data: {
       balance,
-      totalIncome: income._sum.amount ?? 0,
-      totalExpenses: expenses._sum.amount ?? 0,
+      totalIncome: Number(income._sum.amount ?? 0),
+      totalExpenses: Number(expenses._sum.amount ?? 0),
     },
   })
 }

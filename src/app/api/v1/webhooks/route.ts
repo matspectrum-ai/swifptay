@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma/client'
 import { authOptions } from '@/lib/auth/config'
-import { getServerSession } from 'auth.js'
+import { getServerSession } from 'next-auth'
 import { z } from 'zod'
 
 const createWebhookSchema = z.object({

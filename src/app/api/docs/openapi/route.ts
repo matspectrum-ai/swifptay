@@ -1,6 +1,4 @@
-import { NextResponse } from 'next/server'
 import swaggerJSDoc from 'swagger-jsdoc'
-import swaggerUi from 'swagger-ui-express'
 
 const swaggerDefinition = {
   openapi: '3.0.0',
@@ -36,10 +34,7 @@ const swaggerOptions = {
   apis: ['./src/app/api/v1/**/route.ts'],
 }
 
-const swaggerSpec = swaggerJSDoc(swaggerOptions)
-
-export { swaggerSpec }
-
-export async function GET() {
-  return NextResponse.json(swaggerSpec)
+export function GET() {
+  const spec = swaggerJSDoc(swaggerOptions)
+  return Response.json(spec)
 }

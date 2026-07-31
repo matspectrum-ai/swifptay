@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma/client'
 import { authOptions } from '@/lib/auth/config'
-import { getServerSession } from 'auth.js'
+import { getServerSession } from 'next-auth'
 import { z } from 'zod'
 
 const createWithdrawalSchema = z.object({
@@ -42,17 +42,17 @@ export async function POST(request: Request) {
 
   const { amount, pixKey } = parsed.data
 
-  const { data: balance } = await prisma.transaction.aggregate({
+  const balanceResult = await prisma.transaction.aggregate({
     where: { userId: session.user.id, type: 'INCOME', status: 'COMPLETED' },
     _sum: { amount: true },
   })
 
-  const totalIncome = balance._sum.amount ?? 0
-  const totalWithdrawn = await prisma.withdrawal.aggregate({
+  const totalIncome = Number(balanceResult._sum.amount ?? 0)
+  const totalWithdrawnResult = await prisma.withdrawal.aggregate({
     where: { userId: session.user.id, status: 'COMPLETED' },
     _sum: { amount: true },
   })
-  const withdrawnAmount = totalWithdrawn._sum.amount ?? 0
+  const withdrawnAmount = Number(totalWithdrawnResult._sum.amount ?? 0)
   const availableBalance = totalIncome - withdrawnAmount
 
   if (amount > availableBalance) {
