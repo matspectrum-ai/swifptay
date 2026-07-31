@@ -1,7 +1,6 @@
 import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma/client'
-import { authOptions } from '@/lib/auth/config'
-import { getServerSession } from 'next-auth'
+import bcrypt from 'bcrypt'
 import { z } from 'zod'
 
 const registerSchema = z.object({
@@ -34,15 +33,17 @@ export async function POST(request: Request) {
     )
   }
 
+  const passwordHash = await bcrypt.hash(password, 12)
+
   const user = await prisma.user.create({
     data: {
       name,
       email,
-      passwordHash: password,
+      passwordHash,
     },
   })
 
-  const { passwordHash, ...safeUser } = user
+  const { passwordHash: _, ...safeUser } = user
 
   return NextResponse.json({ data: safeUser }, { status: 201 })
 }
