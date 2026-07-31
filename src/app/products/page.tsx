@@ -1,11 +1,13 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import DashboardLayout from '@/components/layout/dashboard-layout'
 import { Card } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Badge } from '@/components/ui/badge'
 import { formatCurrency } from '@/lib/utils'
+import { useSession } from 'next-auth/react'
+import { useEffect, useState } from 'react'
 
 interface Product {
   id: string
@@ -19,145 +21,204 @@ interface Product {
 }
 
 export default function ProductsPage() {
+  const sessionData = useSession()
+  const session = sessionData?.data
   const [products, setProducts] = useState<Product[]>([])
   const [showForm, setShowForm] = useState(false)
   const [name, setName] = useState('')
   const [price, setPrice] = useState('')
   const [description, setDescription] = useState('')
   const [category, setCategory] = useState('')
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+  const [submitting, setSubmitting] = useState(false)
 
   useEffect(() => {
+    if (!session?.user?.id) return
+
+    setLoading(true)
     fetch('/api/v1/products')
-      .then((res) => res.json())
+      .then((res) => {
+        if (!res.ok) throw new Error('Failed to fetch products')
+        return res.json()
+      })
       .then((data) => setProducts(data.data || []))
-  }, [])
+      .catch((err) => setError(err instanceof Error ? err.message : 'Erro ao carregar produtos'))
+      .finally(() => setLoading(false))
+  }, [session?.user?.id])
 
   async function handleCreate(e: React.FormEvent) {
     e.preventDefault()
+    setSubmitting(true)
+    setError(null)
 
-    const res = await fetch('/api/v1/products', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        name,
-        price: parseFloat(price),
-        description,
-        category,
-      }),
-    })
+    try {
+      const res = await fetch('/api/v1/products', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name,
+          price: parseFloat(price),
+          description,
+          category,
+        }),
+      })
 
-    if (res.ok) {
-      setShowForm(false)
-      setName('')
-      setPrice('')
-      setDescription('')
-      setCategory('')
-      const data = await res.json()
-      setProducts([data.data, ...products])
+      if (res.ok) {
+        const data = await res.json()
+        setProducts([data.data, ...products])
+        setShowForm(false)
+        setName('')
+        setPrice('')
+        setDescription('')
+        setCategory('')
+      } else {
+        const err = await res.json()
+        setError(err.error || 'Erro ao criar produto')
+      }
+    } catch {
+      setError('Erro de conexão')
+    } finally {
+      setSubmitting(false)
     }
   }
 
   async function handleDelete(id: string) {
-    const res = await fetch(`/api/v1/products/${id}`, { method: 'DELETE' })
-    if (res.ok) {
-      setProducts(products.filter((p) => p.id !== id))
+    try {
+      const res = await fetch(`/api/v1/products/${id}`, { method: 'DELETE' })
+      if (res.ok) {
+        setProducts(products.filter((p) => p.id !== id))
+      } else {
+        const err = await res.json()
+        setError(err.error || 'Erro ao excluir produto')
+      }
+    } catch {
+      setError('Erro de conexão')
     }
   }
 
   async function handleToggle(id: string, currentStatus: boolean) {
-    const res = await fetch(`/api/v1/products/${id}`, {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ isActive: !currentStatus }),
-    })
-    if (res.ok) {
-      setProducts(
-        products.map((p) =>
-          p.id === id ? { ...p, isActive: !currentStatus } : p
-        )
-      )
+    try {
+      const res = await fetch(`/api/v1/products/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ isActive: !currentStatus }),
+      })
+      if (res.ok) {
+        setProducts(products.map((p) => (p.id === id ? { ...p, isActive: !currentStatus } : p)))
+      } else {
+        const err = await res.json()
+        setError(err.error || 'Erro ao atualizar produto')
+      }
+    } catch {
+      setError('Erro de conexão')
     }
   }
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h1 className="font-display font-bold text-2xl text-text">Produtos</h1>
-        <Button onClick={() => setShowForm(!showForm)}>
-          {showForm ? 'Cancelar' : '+ Novo Produto'}
-        </Button>
-      </div>
+    <DashboardLayout>
+      <div className="space-y-6">
+        <div className="flex items-center justify-between">
+          <h1 className="font-display font-bold text-2xl text-text">Produtos</h1>
+          <Button onClick={() => setShowForm(!showForm)}>
+            {showForm ? 'Cancelar' : '+ Novo Produto'}
+          </Button>
+        </div>
 
-      {showForm && (
-        <Card variant="elevated" className="p-6">
-          <form onSubmit={handleCreate} className="space-y-4">
-            <Input
-              id="name"
-              label="Nome"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              required
-            />
-            <Input
-              id="price"
-              label="Preço (R$)"
-              type="number"
-              step="0.01"
-              min="0.01"
-              value={price}
-              onChange={(e) => setPrice(e.target.value)}
-              required
-            />
-            <Input
-              id="description"
-              label="Descrição"
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-            />
-            <Input
-              id="category"
-              label="Categoria"
-              value={category}
-              onChange={(e) => setCategory(e.target.value)}
-            />
-            <Button type="submit">Criar Produto</Button>
-          </form>
-        </Card>
-      )}
+        {error && (
+          <div className="bg-red-500/10 border border-red-500/20 rounded-xl p-4">
+            <p className="text-red-400 text-sm">{error}</p>
+          </div>
+        )}
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {products.map((product) => (
-          <Card key={product.id} variant="elevated" className="p-5">
-            <div className="flex items-start justify-between mb-3">
-              <h3 className="font-display font-bold text-text">{product.name}</h3>
-              <Badge variant={product.isActive ? 'success' : 'default'}>
-                {product.isActive ? 'Ativo' : 'Inativo'}
-              </Badge>
-            </div>
-            {product.description && (
-              <p className="text-sm text-text-secondary mb-3">{product.description}</p>
-            )}
-            <p className="font-mono text-lg text-primary font-bold">
-              {formatCurrency(product.price)}
-            </p>
-            {product.category && (
-              <p className="text-xs text-text-secondary mt-1">{product.category}</p>
-            )}
-            <div className="flex gap-2 mt-4">
-              <Button
-                variant="secondary"
-                size="sm"
-                onClick={() => handleToggle(product.id, product.isActive)}
-              >
-                {product.isActive ? 'Desativar' : 'Ativar'}
+        {showForm && (
+          <Card variant="elevated" className="p-6">
+            <form onSubmit={handleCreate} className="space-y-4">
+              <Input
+                id="name"
+                label="Nome"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                required
+              />
+              <Input
+                id="price"
+                label="Preço (R$)"
+                type="number"
+                step="0.01"
+                min="0.01"
+                value={price}
+                onChange={(e) => setPrice(e.target.value)}
+                required
+              />
+              <Input
+                id="description"
+                label="Descrição"
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+              />
+              <Input
+                id="category"
+                label="Categoria"
+                value={category}
+                onChange={(e) => setCategory(e.target.value)}
+              />
+              <Button type="submit" loading={submitting}>
+                Criar Produto
               </Button>
-              <Button variant="danger" size="sm" onClick={() => handleDelete(product.id)}>
-                Excluir
-              </Button>
-            </div>
+            </form>
           </Card>
-        ))}
+        )}
+
+        {loading ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {[1, 2, 3].map((i) => (
+              <div key={i} className="bg-surface-elevated border border-white/5 rounded-xl p-5 animate-pulse">
+                <div className="h-4 bg-white/10 rounded w-1/2 mb-3" />
+                <div className="h-6 bg-white/10 rounded w-3/4 mb-4" />
+                <div className="flex gap-2">
+                  <div className="h-8 bg-white/10 rounded w-20" />
+                  <div className="h-8 bg-white/10 rounded w-20" />
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {products.map((product) => (
+              <Card key={product.id} variant="elevated" className="p-5">
+                <div className="flex items-start justify-between mb-3">
+                  <h3 className="font-display font-bold text-text">{product.name}</h3>
+                  <Badge variant={product.isActive ? 'success' : 'default'}>
+                    {product.isActive ? 'Ativo' : 'Inativo'}
+                  </Badge>
+                </div>
+                {product.description && (
+                  <p className="text-sm text-text-secondary mb-3">{product.description}</p>
+                )}
+                <p className="font-mono text-lg text-primary font-bold">
+                  {formatCurrency(product.price)}
+                </p>
+                {product.category && (
+                  <p className="text-xs text-text-secondary mt-1">{product.category}</p>
+                )}
+                <div className="flex gap-2 mt-4">
+                  <Button
+                    variant="secondary"
+                    size="sm"
+                    onClick={() => handleToggle(product.id, product.isActive)}
+                  >
+                    {product.isActive ? 'Desativar' : 'Ativar'}
+                  </Button>
+                  <Button variant="danger" size="sm" onClick={() => handleDelete(product.id)}>
+                    Excluir
+                  </Button>
+                </div>
+              </Card>
+            ))}
+          </div>
+        )}
       </div>
-    </div>
+    </DashboardLayout>
   )
 }

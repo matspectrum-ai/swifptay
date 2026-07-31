@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import { Inter, Space_Grotesk, JetBrains_Mono } from 'next/font/google'
 import './globals.css'
+import Providers from './providers'
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-body' })
 const spaceGrotesk = Space_Grotesk({ subsets: ['latin'], weight: ['700'], variable: '--font-display' })
@@ -15,7 +16,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="pt-BR" className="dark">
       <body className={`${inter.variable} ${spaceGrotesk.variable} ${jetBrainsMono.variable} font-body bg-bg text-text antialiased`}>
-        {children}
+        <Providers>{children}</Providers>
       </body>
     </html>
   )
