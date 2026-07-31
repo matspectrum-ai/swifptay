@@ -7,7 +7,7 @@ import { z } from 'zod'
 const createWebhookSchema = z.object({
   url: z.string().url(),
   secret: z.string().min(1),
-  events: z.array(z.string()).default(['charge.completed', 'charge.failed']),
+  events: z.array(z.enum(['charge.completed', 'charge.failed'])).default(['charge.completed', 'charge.failed']),
 })
 
 export async function GET(request: NextRequest) {

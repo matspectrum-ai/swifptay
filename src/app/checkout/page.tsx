@@ -31,7 +31,11 @@ export default function CheckoutPage() {
 
     if (res.ok) {
       const data = await res.json()
-      setQrCode(data.data.qrCodeUrl || `data:image/svg+xml;base64,${btoa('<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200"><rect width="200" height="200" fill="#0A0A0A"/><text x="100" y="100" text-anchor="middle" fill="#7CFC00" font-size="14" font-family="monospace">QR Code</text></svg>')}`)
+      const svg = '<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200"><rect width="200" height="200" fill="#0A0A0A"/><text x="100" y="100" text-anchor="middle" fill="#7CFC00" font-size="14" font-family="monospace">QR Code</text></svg>'
+      const base64 = typeof btoa !== 'undefined'
+        ? btoa(unescape(encodeURIComponent(svg)))
+        : Buffer.from(svg).toString('base64')
+      setQrCode(data.data.qrCodeUrl || `data:image/svg+xml;base64,${base64}`)
     } else {
       const data = await res.json()
       setError(data.error || 'Erro ao criar cobrança')

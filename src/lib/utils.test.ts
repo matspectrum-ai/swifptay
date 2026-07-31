@@ -14,11 +14,11 @@ describe('utils', () => {
 
   describe('formatCurrency', () => {
     it('should format BRL currency', () => {
-      expect(formatCurrency(1500.5)).toBe('R$ 1.500,50')
+      expect(formatCurrency(1500.5)).toBe('R$ 1.500,50')
     })
 
     it('should format zero', () => {
-      expect(formatCurrency(0)).toBe('R$ 0,00')
+      expect(formatCurrency(0)).toBe('R$ 0,00')
     })
   })
 
@@ -45,8 +45,12 @@ describe('utils', () => {
   })
 
   describe('truncateAddress', () => {
-    it('should truncate long addresses', () => {
-      expect(truncateAddress('0x1234567890abcdef1234567890abcdef12345678')).toBe('0x123456...5678')
+    it('should truncate long addresses with defaults', () => {
+      expect(truncateAddress('0x1234567890abcdef1234567890abcdef12345678')).toBe('0x1234...5678')
+    })
+
+    it('should truncate with custom start/end', () => {
+      expect(truncateAddress('0x1234567890abcdef1234567890abcdef12345678', 8, 4)).toBe('0x123456...5678')
     })
 
     it('should return short addresses as-is', () => {

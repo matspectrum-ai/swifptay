@@ -32,7 +32,7 @@ export async function POST(request: NextRequest) {
         chargeId: event.data.chargeId,
         type: 'INCOME',
         method: 'PIX',
-        amount: event.data.amount,
+        amount: Number(event.data.amount),
         status: 'COMPLETED',
         provider: 'openpix',
         metadata: event.data,

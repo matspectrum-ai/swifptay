@@ -1,16 +1,18 @@
-import { describe, it, expect, beforeEach, afterEach } from 'vitest'
+import { describe, it, expect, beforeEach, afterEach, skipIf } from 'vitest'
 import { prisma } from '@/lib/prisma/client'
+
+const hasDb = !!process.env.DATABASE_URL
 
 describe('prisma client', () => {
   beforeEach(async () => {
-    await prisma.$connect()
+    if (hasDb) await prisma.$connect()
   })
 
   afterEach(async () => {
-    await prisma.$disconnect()
+    if (hasDb) await prisma.$disconnect()
   })
 
-  it('should connect to the database', async () => {
+  it.skipIf(!hasDb)('should connect to the database', async () => {
     const result = await prisma.$queryRaw`SELECT 1`
     expect(result).toBeDefined()
   })

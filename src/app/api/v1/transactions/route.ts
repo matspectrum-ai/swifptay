@@ -17,17 +17,26 @@ export async function GET(request: NextRequest) {
   const dateFrom = searchParams.get('dateFrom') || undefined
   const dateTo = searchParams.get('dateTo') || undefined
 
-  const where: Record<string, unknown> = { userId: session.user.id }
+  const where: {
+    userId: string
+    status?: 'PENDING' | 'COMPLETED' | 'FAILED' | 'REFUNDED'
+    type?: 'INCOME' | 'EXPENSE'
+    createdAt?: { gte?: Date; lte?: Date }
+  } = { userId: session.user.id }
 
-  if (status) where['status'] = status
-  if (type) where['type'] = type
+  if (status && ['PENDING', 'COMPLETED', 'FAILED', 'REFUNDED'].includes(status)) {
+    where.status = status as 'PENDING' | 'COMPLETED' | 'FAILED' | 'REFUNDED'
+  }
+  if (type && (type === 'INCOME' || type === 'EXPENSE')) {
+    where.type = type
+  }
   if (dateFrom || dateTo) {
-    where['createdAt'] = {}
+    where.createdAt = {}
     if (dateFrom) {
-      ;(where['createdAt'] as Record<string, unknown>)['gte'] = new Date(dateFrom)
+      where.createdAt.gte = new Date(dateFrom)
     }
     if (dateTo) {
-      ;(where['createdAt'] as Record<string, unknown>)['lte'] = new Date(dateTo)
+      where.createdAt.lte = new Date(dateTo)
     }
   }
 

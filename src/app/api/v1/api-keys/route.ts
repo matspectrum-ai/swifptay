@@ -42,7 +42,7 @@ export async function POST(request: Request) {
   }
 
   const rawKey = `spk_${randomBytes(32).toString('hex')}`
-  const keyHash = createHmac('sha256', process.env.NEXTAUTH_SECRET || 'fallback')
+  const keyHash = createHmac('sha256', process.env.NEXTAUTH_SECRET!)
     .update(rawKey)
     .digest('hex')
 
@@ -55,5 +55,6 @@ export async function POST(request: Request) {
     },
   })
 
-  return NextResponse.json({ data: { ...apiKey, key: rawKey } }, { status: 201 })
+  const { keyHash: _, ...safeKey } = apiKey
+  return NextResponse.json({ data: { ...safeKey, key: rawKey } }, { status: 201 })
 }

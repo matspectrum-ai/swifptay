@@ -14,19 +14,18 @@ const updateProductSchema = z.object({
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: { id: string } }
 ) {
   const session = await getServerSession(authOptions)
   if (!session?.user?.id) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
-  const { id } = await params
-  const product = await prisma.product.findFirst({
-    where: { id, userId: session.user.id },
+  const product = await prisma.product.findUnique({
+    where: { id: params.id },
   })
 
-  if (!product) {
+  if (!product || product.userId !== session.user.id) {
     return NextResponse.json({ error: 'Not found' }, { status: 404 })
   }
 
@@ -35,14 +34,13 @@ export async function GET(
 
 export async function PUT(
   request: Request,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: { id: string } }
 ) {
   const session = await getServerSession(authOptions)
   if (!session?.user?.id) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
-  const { id } = await params
   const body = await request.json()
   const parsed = updateProductSchema.safeParse(body)
 
@@ -53,35 +51,38 @@ export async function PUT(
     )
   }
 
-  const product = await prisma.product.updateMany({
-    where: { id, userId: session.user.id },
+  const product = await prisma.product.update({
+    where: { id: params.id },
     data: parsed.data,
   })
 
-  if (product.count === 0) {
+  if (product.userId !== session.user.id) {
     return NextResponse.json({ error: 'Not found' }, { status: 404 })
   }
 
-  return NextResponse.json({ data: { updated: product.count } })
+  return NextResponse.json({ data: product })
 }
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: { id: string } }
 ) {
   const session = await getServerSession(authOptions)
   if (!session?.user?.id) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
-  const { id } = await params
-  const product = await prisma.product.deleteMany({
-    where: { id, userId: session.user.id },
+  const product = await prisma.product.findUnique({
+    where: { id: params.id },
   })
 
-  if (product.count === 0) {
+  if (!product || product.userId !== session.user.id) {
     return NextResponse.json({ error: 'Not found' }, { status: 404 })
   }
 
-  return NextResponse.json({ data: { deleted: product.count } })
+  await prisma.product.delete({
+    where: { id: params.id },
+  })
+
+  return NextResponse.json({ data: { deleted: true } })
 }

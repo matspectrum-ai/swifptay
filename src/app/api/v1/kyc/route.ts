@@ -48,9 +48,21 @@ export async function PATCH(request: Request) {
     )
   }
 
+  const updateData: Record<string, unknown> = {}
+  if (parsed.data.kycStatus) {
+    updateData.kycStatus = parsed.data.kycStatus
+  }
+
+  if (Object.keys(updateData).length === 0) {
+    return NextResponse.json(
+      { error: 'No valid fields to update' },
+      { status: 400 }
+    )
+  }
+
   await prisma.user.update({
     where: { id: session.user.id },
-    data: { kycStatus: parsed.data.kycStatus },
+    data: updateData,
   })
 
   return NextResponse.json({ data: { updated: true } })
