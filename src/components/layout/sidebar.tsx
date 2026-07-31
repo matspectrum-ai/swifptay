@@ -11,6 +11,8 @@ const menuItems = [
   { href: '/transactions', label: 'Transações', icon: '📋' },
   { href: '/balance', label: 'Saldo', icon: '💳' },
   { href: '/withdraw', label: 'Saque', icon: '🏦' },
+  { href: '/kyc', label: 'Compliance', icon: '🛡️' },
+  { href: '/notifications', label: 'Notificações', icon: '🔔' },
 ]
 
 export function Sidebar({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {

@@ -7,6 +7,7 @@ const navItems = [
   { href: '/products', label: 'Produtos', icon: '📦' },
   { href: '/checkout', label: 'Receber', icon: '💰' },
   { href: '/balance', label: 'Saldo', icon: '💳' },
+  { href: '/notifications', label: 'Notifs', icon: '🔔' },
 ]
 
 export function BottomNav() {
