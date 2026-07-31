@@ -1,4 +1,7 @@
-module.exports = {
+import { defineConfig } from 'vitest/config'
+import path from 'path'
+
+export default defineConfig({
   test: {
     environment: 'jsdom',
     include: ['src/**/*.test.{ts,tsx}'],
@@ -15,4 +18,9 @@ module.exports = {
       'src/app/api/auth/[...nextauth]/route.ts',
     ],
   },
-}
+  resolve: {
+    alias: {
+      '@': path.resolve(__dirname, './src'),
+    },
+  },
+})
