@@ -68,6 +68,47 @@ SWIFPTAY/
 4. Run `npm install` and `npm run dev` to start the Next.js app
 5. Open `http://localhost:3000`
 
+## Deploy
+
+### VPS (Backend)
+
+```bash
+# Build and start all services
+make docker:build
+make docker:up
+
+# Or manually
+docker compose up -d --build
+```
+
+The backend runs on `http://localhost:3001` (exposed via Nginx on ports 80/443).
+
+### Vercel (Frontend)
+
+```bash
+# Deploy to Vercel
+npx vercel --prod
+```
+
+Set the following environment variables in Vercel:
+- `NEXTAUTH_URL` — your frontend URL
+- `NEXTAUTH_SECRET` — a random secret
+- `GOOGLE_CLIENT_ID` — Google OAuth client ID
+- `GOOGLE_CLIENT_SECRET` — Google OAuth client secret
+- `API_BASE_URL` — your VPS API URL (e.g., `https://api.swiftpay.com.br`)
+- `CORS_ORIGIN` — your frontend URL
+
+### CI/CD
+
+GitHub Actions automatically runs lint, tests, and builds on every push to `master`. Deploy to VPS and Vercel is triggered on merge to `master`.
+
+Required GitHub Secrets:
+- `VPS_USER` — SSH user for your VPS
+- `VPS_HOST` — VPS hostname or IP
+- `VERCEL_TOKEN` — Vercel API token
+- `VERCEL_ORG_ID` — Vercel organization ID
+- `VERCEL_PROJECT_ID` — Vercel project ID
+
 ## API Documentation
 
 Once the server is running, the interactive API docs are available at:
