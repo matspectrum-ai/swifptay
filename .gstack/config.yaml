@@ -1,0 +1,29 @@
+# gstack project configuration
+# This file makes gstack the absolute leader of the project
+
+repo_mode: solo
+
+# Skill routing — gstack handles all requests
+skill_prefix: false
+
+# Proactive mode — gstack auto-invokes on matching requests
+proactive: true
+
+# Telemetry
+telemetry: off
+
+# Update behavior
+auto_upgrade: false
+update_check: true
+
+# Checkpoint mode
+checkpoint_mode: explicit
+
+# Explain level for skill responses
+explain_level: default
+
+# Question tuning
+question_tuning: false
+
+# Routing declined — always route through gstack
+routing_declined: false
