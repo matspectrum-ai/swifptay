@@ -1,0 +1,190 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String   @id @default(uuid())
+  email         String   @unique
+  name          String?
+  passwordHash  String?
+  avatarUrl     String?
+  kycStatus     KycStatus @default(PENDING)
+  role          Role     @default(MERCHANT)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  products     Product[]
+  charges      Charge[]
+  transactions Transaction[]
+  withdrawals  Withdrawal[]
+  apiKeys      ApiKey[]
+  webhooks     Webhook[]
+}
+
+model Product {
+  id          String   @id @default(uuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name        String
+  description String?
+  price       Decimal
+  category    String?
+  isActive    Boolean  @default(true)
+  qrCodeData  String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  charges Charge[]
+}
+
+model Charge {
+  id                   String   @id @default(uuid())
+  userId               String
+  user                 User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  productId            String?
+  product              Product? @relation(fields: [productId], references: [id])
+  amount               Decimal
+  pixKey               String
+  status               ChargeStatus @default(PENDING)
+  openpixTransactionId String?
+  qrCodeUrl            String?
+  expiresAt            DateTime
+  createdAt            DateTime @default(now())
+  completedAt          DateTime?
+
+  transactions Transaction[]
+}
+
+model Transaction {
+  id          String   @id @default(uuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  chargeId    String?
+  charge      Charge?  @relation(fields: [chargeId], references: [id])
+  type        TransactionType
+  method      PaymentMethod @default(PIX)
+  amount      Decimal
+  status      TransactionStatus @default(PENDING)
+  provider    String   @default("openpix")
+  metadata    Json?
+  createdAt   DateTime @default(now())
+}
+
+model Withdrawal {
+  id              String   @id @default(uuid())
+  userId          String
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  amount          Decimal
+  pixKey          String
+  status          WithdrawalStatus @default(PROCESSING)
+  transactionId   String?
+  transaction     Transaction? @relation(fields: [transactionId], references: [id])
+  createdAt       DateTime @default(now())
+  completedAt     DateTime?
+}
+
+model Provider {
+  id          String   @id @default(uuid())
+  name        String
+  apiKey      String
+  baseUrl     String
+  status      ProviderStatus @default(ACTIVE)
+  priority    Int
+  feePercent  Decimal
+  config      Json?
+  createdAt   DateTime @default(now())
+}
+
+model ApiKey {
+  id          String   @id @default(uuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  keyHash     String
+  name        String
+  permissions Json
+  lastUsedAt  DateTime?
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+}
+
+model Webhook {
+  id          String   @id @default(uuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  url         String
+  secret      String
+  events      Json
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+
+  deliveries WebhookDelivery[]
+}
+
+model WebhookDelivery {
+  id          String   @id @default(uuid())
+  webhookId   String
+  webhook     Webhook  @relation(fields: [webhookId], references: [id], onDelete: Cascade)
+  payload     Json
+  status      DeliveryStatus @default(PENDING)
+  response    String?
+  attempts    Int      @default(0)
+  nextRetryAt DateTime?
+  createdAt   DateTime @default(now())
+}
+
+enum KycStatus {
+  PENDING
+  VERIFIED
+  REJECTED
+}
+
+enum Role {
+  MERCHANT
+  ADMIN
+}
+
+enum ChargeStatus {
+  PENDING
+  COMPLETED
+  FAILED
+  EXPIRED
+}
+
+enum TransactionType {
+  INCOME
+  EXPENSE
+}
+
+enum PaymentMethod {
+  PIX
+}
+
+enum TransactionStatus {
+  PENDING
+  COMPLETED
+  FAILED
+  REFUNDED
+}
+
+enum WithdrawalStatus {
+  PROCESSING
+  COMPLETED
+  FAILED
+}
+
+enum ProviderStatus {
+  ACTIVE
+  INACTIVE
+  DEGRADED
+}
+
+enum DeliveryStatus {
+  PENDING
+  DELIVERED
+  FAILED
+}
