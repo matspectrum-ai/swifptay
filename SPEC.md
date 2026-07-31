@@ -359,7 +359,7 @@ The MVP is considered complete when:
 5. API documentation is live at `/api/docs`
 6. Deploy pipeline works (Vercel + VPS Docker Compose)
 7. Security audit passes (no critical vulnerabilities)
-10. Merchant can complete end-to-end flow: register → create product → receive Pix payment → see transaction → request withdrawal
+8. Merchant can complete end-to-end flow: register → create product → receive Pix payment → see transaction → request withdrawal
 
 ## 10. Out of Scope (MVP)
 
@@ -381,17 +381,17 @@ The MVP is considered complete when:
 
 | Phase | Duration |
 |---|---|
-| Setup & scaffolding | 2 days |
+| Setup & scaffolding | 3 days |
 | Auth + Dashboard | 4 days |
 | Products CRUD | 3 days |
-| Checkout + OpenPix integration | 4 days |
+| Checkout + OpenPix integration | 5 days |
 | API + Documentation | 4 days |
 | Transactions + Balances + Withdrawals | 3 days |
 | MultiPay layer + Provider registry | 2 days |
 | Compliance/KYC + Notifications | 2 days |
-| QA + Testing | 3 days |
+| QA + Testing | 4 days |
 | Polish + Deploy | 2 days |
-| **Total** | **29 working days** |
+| **Total** | **32 working days** |
 
 ## 12. Risks
 

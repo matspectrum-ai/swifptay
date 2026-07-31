@@ -24,6 +24,10 @@ model User {
   withdrawals  Withdrawal[]
   apiKeys      ApiKey[]
   webhooks     Webhook[]
+
+  @@index([email])
+  @@index([role])
+  @@index([kycStatus])
 }
 
 model Product {
@@ -40,6 +44,10 @@ model Product {
   updatedAt   DateTime @updatedAt
 
   charges Charge[]
+
+  @@index([userId])
+  @@index([isActive])
+  @@index([category])
 }
 
 model Charge {
@@ -58,6 +66,11 @@ model Charge {
   completedAt          DateTime?
 
   transactions Transaction[]
+
+  @@index([userId])
+  @@index([status])
+  @@index([productId])
+  @@index([expiresAt])
 }
 
 model Transaction {
@@ -73,6 +86,12 @@ model Transaction {
   provider    String   @default("openpix")
   metadata    Json?
   createdAt   DateTime @default(now())
+
+  @@index([userId])
+  @@index([status])
+  @@index([type])
+  @@index([chargeId])
+  @@index([createdAt])
 }
 
 model Withdrawal {
@@ -86,6 +105,10 @@ model Withdrawal {
   transaction     Transaction? @relation(fields: [transactionId], references: [id])
   createdAt       DateTime @default(now())
   completedAt     DateTime?
+
+  @@index([userId])
+  @@index([status])
+  @@index([transactionId])
 }
 
 model Provider {
@@ -98,6 +121,10 @@ model Provider {
   feePercent  Decimal
   config      Json?
   createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([name])
+  @@index([status])
 }
 
 model ApiKey {
@@ -110,6 +137,11 @@ model ApiKey {
   lastUsedAt  DateTime?
   isActive    Boolean  @default(true)
   createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([userId])
+  @@index([keyHash])
+  @@index([isActive])
 }
 
 model Webhook {
@@ -121,8 +153,12 @@ model Webhook {
   events      Json
   isActive    Boolean  @default(true)
   createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 
   deliveries WebhookDelivery[]
+
+  @@index([userId])
+  @@index([url])
 }
 
 model WebhookDelivery {
@@ -135,6 +171,10 @@ model WebhookDelivery {
   attempts    Int      @default(0)
   nextRetryAt DateTime?
   createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([webhookId])
+  @@index([status])
 }
 
 enum KycStatus {
@@ -162,6 +202,8 @@ enum TransactionType {
 
 enum PaymentMethod {
   PIX
+  CREDIT_CARD
+  BOLETO
 }
 
 enum TransactionStatus {
