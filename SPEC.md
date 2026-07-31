@@ -12,7 +12,7 @@ SwiftPay is a fintech platform for Pix payment processing. The MVP replicates th
 
 ## 1. Problem Statement
 
-Merants need a simple, fast way to receive Pix payments, manage products, and track transactions. Existing solutions are complex or expensive. SwiftPay provides a clean, modern interface with OpenPix as the payment provider and a public API for third-party integrations.
+Merchants need a simple, fast way to receive Pix payments, manage products, and track transactions. Existing solutions are complex or expensive. SwiftPay provides a clean, modern interface with OpenPix as the payment provider and a public API for third-party integrations.
 
 ## 2. Goals
 
