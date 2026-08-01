@@ -63,7 +63,7 @@ export default function CheckoutPage() {
         <h1 className="font-display font-bold text-2xl text-text">Receber Pix</h1>
 
         {error && (
-          <div className="bg-red-500/10 border border-red-500/20 rounded-xl p-4">
+          <div className="bg-red-500/10 border border-red-500/20 rounded-lg p-4">
             <p className="text-red-400 text-sm">{error}</p>
           </div>
         )}
@@ -98,7 +98,7 @@ export default function CheckoutPage() {
         {qrCode && (
           <Card variant="elevated" className="p-6 text-center">
             <h3 className="font-display font-bold text-text mb-4">QR Code do Pagamento</h3>
-            <div className="bg-surface rounded-xl p-6 inline-block">
+            <div className="bg-surface rounded-lg p-6 inline-block">
               <img src={qrCode} alt="QR Code Pix" className="w-48 h-48" />
             </div>
             <p className="text-sm text-text-secondary mt-4">

@@ -39,7 +39,7 @@ export default function BalancePage() {
           <h1 className="font-display font-bold text-2xl text-text">Saldo</h1>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             {[1, 2, 3].map((i) => (
-              <div key={i} className="bg-surface-elevated border border-white/5 rounded-xl p-6 animate-pulse">
+              <div key={i} className="bg-surface-elevated rounded-lg p-6 animate-pulse">
                 <div className="h-4 bg-white/10 rounded w-1/2 mb-4" />
                 <div className="h-8 bg-white/10 rounded w-3/4" />
               </div>
@@ -55,7 +55,7 @@ export default function BalancePage() {
       <DashboardLayout>
         <div className="space-y-6">
           <h1 className="font-display font-bold text-2xl text-text">Saldo</h1>
-          <div className="bg-red-500/10 border border-red-500/20 rounded-xl p-6">
+          <div className="bg-red-500/10 border border-red-500/20 rounded-lg p-6">
             <p className="text-red-400">{error || 'Erro ao carregar saldo'}</p>
           </div>
         </div>

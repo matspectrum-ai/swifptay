@@ -7,6 +7,15 @@ import { Button } from '@/components/ui/button'
 import { formatDate } from '@/lib/utils'
 import { useSession } from 'next-auth/react'
 import { useEffect, useState } from 'react'
+import {
+  Wallet,
+  XCircle,
+  Landmark,
+  AlertTriangle,
+  CheckCircle2,
+  X,
+  Bell,
+} from 'lucide-react'
 
 interface Notification {
   id: string
@@ -15,6 +24,16 @@ interface Notification {
   type: string
   read: boolean
   createdAt: string
+}
+
+const typeIconMap: Record<string, React.ReactNode> = {
+  payment_received: <Wallet className="w-5 h-5 text-primary" />,
+  payment_failed: <XCircle className="w-5 h-5 text-red-400" />,
+  withdrawal_processed: <Landmark className="w-5 h-5 text-primary" />,
+  withdrawal_failed: <AlertTriangle className="w-5 h-5 text-yellow-400" />,
+  kyc_verified: <CheckCircle2 className="w-5 h-5 text-primary" />,
+  kyc_rejected: <X className="w-5 h-5 text-red-400" />,
+  system: <Bell className="w-5 h-5 text-text-secondary" />,
 }
 
 export default function NotificationsPage() {
@@ -66,16 +85,6 @@ export default function NotificationsPage() {
     }
   }
 
-  const typeIcon = {
-    payment_received: '💰',
-    payment_failed: '❌',
-    withdrawal_processed: '🏦',
-    withdrawal_failed: '⚠️',
-    kyc_verified: '✅',
-    kyc_rejected: '❌',
-    system: '🔔',
-  }
-
   return (
     <DashboardLayout>
       <div className="max-w-2xl mx-auto space-y-6">
@@ -89,7 +98,7 @@ export default function NotificationsPage() {
         </div>
 
         {error && (
-          <div className="bg-red-500/10 border border-red-500/20 rounded-xl p-4">
+          <div className="bg-red-500/10 border border-red-500/20 rounded-lg p-4">
             <p className="text-red-400 text-sm">{error}</p>
           </div>
         )}
@@ -115,7 +124,9 @@ export default function NotificationsPage() {
                   }`}
                   onClick={() => markAsRead(notification.id)}
                 >
-                  <span className="text-xl mt-0.5">{typeIcon[notification.type as keyof typeof typeIcon] || '🔔'}</span>
+                  <span className="mt-0.5">
+                    {typeIconMap[notification.type as keyof typeof typeIconMap] || <Bell className="w-5 h-5 text-text-secondary" />}
+                  </span>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2">
                       <p className="text-sm font-medium text-text">{notification.title}</p>

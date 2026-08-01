@@ -77,7 +77,7 @@ export default function DashboardPage() {
           <h1 className="font-display font-bold text-2xl text-text">Dashboard</h1>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             {[1, 2, 3, 4].map((i) => (
-              <div key={i} className="bg-surface-elevated border border-white/5 rounded-xl p-6 animate-pulse">
+              <div key={i} className="bg-surface-elevated rounded-lg p-6 animate-pulse">
                 <div className="h-4 bg-white/10 rounded w-1/2 mb-4" />
                 <div className="h-8 bg-white/10 rounded w-3/4" />
               </div>
@@ -93,7 +93,7 @@ export default function DashboardPage() {
       <DashboardLayout>
         <div className="space-y-6">
           <h1 className="font-display font-bold text-2xl text-text">Dashboard</h1>
-          <div className="bg-red-500/10 border border-red-500/20 rounded-xl p-6">
+          <div className="bg-red-500/10 border border-red-500/20 rounded-lg p-6">
             <p className="text-red-400">{error}</p>
           </div>
         </div>
@@ -107,10 +107,10 @@ export default function DashboardPage() {
         <h1 className="font-display font-bold text-2xl text-text">Dashboard</h1>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          <StatsCard title="Saldo" value={stats.balance} icon="💰" variant="income" />
-          <StatsCard title="Receitas" value={stats.totalIncome} icon="📈" variant="income" />
-          <StatsCard title="Despesas" value={stats.totalExpenses} icon="📉" variant="expense" />
-          <StatsCard title="Transações" value={stats.transactionCount} icon="📋" />
+          <StatsCard title="Saldo" value={stats.balance} icon="wallet" variant="income" />
+          <StatsCard title="Receitas" value={stats.totalIncome} icon="trending-up" variant="income" />
+          <StatsCard title="Despesas" value={stats.totalExpenses} icon="trending-down" variant="expense" />
+          <StatsCard title="Transações" value={stats.transactionCount} icon="receipt" />
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">

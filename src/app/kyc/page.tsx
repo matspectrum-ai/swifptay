@@ -84,7 +84,7 @@ export default function KycPage() {
         <h1 className="font-display font-bold text-2xl text-text">Compliance / KYC</h1>
 
         {error && (
-          <div className="bg-red-500/10 border border-red-500/20 rounded-xl p-4">
+          <div className="bg-red-500/10 border border-red-500/20 rounded-lg p-4">
             <p className="text-red-400 text-sm">{error}</p>
           </div>
         )}
@@ -136,7 +136,7 @@ export default function KycPage() {
               <select
                 value={docType}
                 onChange={(e) => setDocType(e.target.value)}
-                className="w-full px-4 py-2.5 bg-surface border border-white/10 rounded-lg text-text focus:outline-none focus:border-primary"
+                className="w-full px-4 py-2.5 bg-surface border border-white/10 rounded-md text-text focus:outline-none focus:border-primary"
                 required
               >
                 <option value="">Selecione o tipo de documento</option>

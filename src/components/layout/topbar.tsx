@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
+import { Search, Bell, Settings } from 'lucide-react'
 
 export function TopBar({ onMenuToggle }: { onMenuToggle: () => void }) {
   const [notifications] = useState(3)
@@ -21,9 +22,7 @@ export function TopBar({ onMenuToggle }: { onMenuToggle: () => void }) {
           </button>
 
           <div className="relative hidden sm:block">
-            <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-text-secondary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-            </svg>
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-text-secondary" />
             <input
               type="search"
               placeholder="Pesquisar..."
@@ -34,14 +33,16 @@ export function TopBar({ onMenuToggle }: { onMenuToggle: () => void }) {
 
         <div className="flex items-center gap-3">
           <Link href="/notifications" className="relative p-2 rounded-lg text-text-secondary hover:text-text hover:bg-surface-elevated" aria-label="Notifications">
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
-            </svg>
+            <Bell className="w-5 h-5" />
             {notifications > 0 && (
               <span className="absolute -top-1 -right-1 w-5 h-5 bg-primary text-bg text-xs font-bold rounded-full flex items-center justify-center">
                 {notifications}
               </span>
             )}
+          </Link>
+
+          <Link href="/settings" className="p-2 rounded-lg text-text-secondary hover:text-text hover:bg-surface-elevated" aria-label="Settings">
+            <Settings className="w-5 h-5" />
           </Link>
 
           <div className="w-8 h-8 bg-primary/20 rounded-full flex items-center justify-center">

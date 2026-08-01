@@ -6,15 +6,15 @@ interface CardProps extends React.HTMLAttributes<HTMLDivElement> {
 
 export function Card({ className, variant = 'default', children, ...props }: CardProps) {
   const variants = {
-    default: 'bg-surface border border-white/5',
-    elevated: 'bg-surface-elevated border border-white/5 shadow-md',
-    glass: 'bg-surface-glass backdrop-blur-md border border-white/10',
+    default: 'bg-surface',
+    elevated: 'bg-surface-elevated',
+    glass: 'bg-surface-glass backdrop-blur-md',
   }
 
   return (
     <div
       className={cn(
-        'rounded-xl p-6 transition-all duration-200',
+        'rounded-lg p-6 transition-all duration-200',
         variants[variant],
         className
       )}
