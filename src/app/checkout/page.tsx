@@ -7,6 +7,8 @@ import { Button } from '@/components/ui/button'
 import { formatCurrency } from '@/lib/utils'
 import { useSession } from 'next-auth/react'
 import { useState } from 'react'
+import QRCode from 'qrcode'
+import { buildPixPayload } from '@/lib/pix/payload'
 
 export default function CheckoutPage() {
   const sessionData = useSession()
@@ -14,6 +16,7 @@ export default function CheckoutPage() {
   const [amount, setAmount] = useState('')
   const [pixKey, setPixKey] = useState('')
   const [qrCode, setQrCode] = useState<string | null>(null)
+  const [pixPayload, setPixPayload] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
@@ -27,6 +30,7 @@ export default function CheckoutPage() {
     setLoading(true)
     setError(null)
     setQrCode(null)
+    setPixPayload(null)
 
     try {
       const res = await fetch('/api/v1/charges', {
@@ -41,11 +45,23 @@ export default function CheckoutPage() {
 
       if (res.ok) {
         const data = await res.json()
-        const svg = '<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200"><rect width="200" height="200" fill="#0A0A0A"/><text x="100" y="100" text-anchor="middle" fill="#7CFC00" font-size="14" font-family="monospace">QR Code</text></svg>'
-        const base64 = typeof btoa !== 'undefined'
-          ? btoa(unescape(encodeURIComponent(svg)))
-          : Buffer.from(svg).toString('base64')
-        setQrCode(data.data.qrCodeUrl || `data:image/svg+xml;base64,${base64}`)
+        const payload = buildPixPayload(
+          pixKey,
+          parseFloat(amount),
+          'SwiftPay',
+          'São Paulo',
+          data.data?.id
+        )
+        const qrDataUrl = await QRCode.toDataURL(payload, {
+          width: 300,
+          margin: 2,
+          color: {
+            dark: '#0A0A0A',
+            light: '#7CFC00',
+          },
+        })
+        setQrCode(qrDataUrl)
+        setPixPayload(payload)
       } else {
         const err = await res.json()
         setError(err.error || 'Erro ao criar cobrança')
@@ -104,6 +120,14 @@ export default function CheckoutPage() {
             <p className="text-sm text-text-secondary mt-4">
               QR Code válido por 24 horas
             </p>
+            {pixPayload && (
+              <details className="mt-4 text-left">
+                <summary className="text-xs text-text-secondary cursor-pointer mb-2">Payload Pix (EMVCo)</summary>
+                <pre className="bg-surface p-3 rounded-lg text-xs text-text-secondary overflow-x-auto break-all">
+                  {pixPayload}
+                </pre>
+              </details>
+            )}
           </Card>
         )}
       </div>

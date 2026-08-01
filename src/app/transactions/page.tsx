@@ -3,10 +3,12 @@
 import DashboardLayout from '@/components/layout/dashboard-layout'
 import { Card } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
 import { formatCurrency } from '@/lib/utils'
 import { formatDate } from '@/lib/utils'
 import { useSession } from 'next-auth/react'
 import { useEffect, useState } from 'react'
+import { Download } from 'lucide-react'
 
 interface Transaction {
   id: string
@@ -44,6 +46,31 @@ export default function TransactionsPage() {
       .finally(() => setLoading(false))
   }, [session?.user?.id, statusFilter, typeFilter])
 
+  function handleExportCsv() {
+    if (!transactions.length) return
+    const header = 'id,amount,status,type,method,createdAt\n'
+    const rows = transactions.map((tx) =>
+      [
+        tx.id,
+        tx.amount,
+        tx.status,
+        tx.type,
+        tx.method,
+        new Date(tx.createdAt).toISOString(),
+      ].join(',')
+    ).join('\n')
+    const csv = header + rows
+    const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' })
+    const url = URL.createObjectURL(blob)
+    const link = document.createElement('a')
+    link.href = url
+    link.download = `transacoes_${new Date().toISOString().slice(0, 10)}.csv`
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+    URL.revokeObjectURL(url)
+  }
+
   const statusVariant = {
     COMPLETED: 'success',
     PENDING: 'warning',
@@ -54,7 +81,13 @@ export default function TransactionsPage() {
   return (
     <DashboardLayout>
       <div className="space-y-6">
-        <h1 className="font-display font-bold text-2xl text-text">Transações</h1>
+        <div className="flex items-center justify-between">
+          <h1 className="font-display font-bold text-2xl text-text">Transações</h1>
+          <Button variant="secondary" size="sm" onClick={handleExportCsv} disabled={!transactions.length}>
+            <Download className="w-4 h-4 mr-2" />
+            Exportar CSV
+          </Button>
+        </div>
 
         <div className="flex gap-3">
           <select

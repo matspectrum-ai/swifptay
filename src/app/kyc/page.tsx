@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button'
 import { formatDate } from '@/lib/utils'
 import { useSession } from 'next-auth/react'
 import { useEffect, useState } from 'react'
+import { FileUpload } from '@/components/forms/file-upload'
 
 interface KycDocument {
   id: string
@@ -21,7 +22,6 @@ export default function KycPage() {
   const session = sessionData?.data
   const [kycStatus, setKycStatus] = useState<'PENDING' | 'VERIFIED' | 'REJECTED'>('PENDING')
   const [documents, setDocuments] = useState<KycDocument[]>([])
-  const [showUpload, setShowUpload] = useState(false)
   const [docType, setDocType] = useState('')
   const [loading, setLoading] = useState(false)
   const [fetchLoading, setFetchLoading] = useState(true)
@@ -44,23 +44,29 @@ export default function KycPage() {
       .finally(() => setFetchLoading(false))
   }, [session?.user?.id])
 
-  async function handleUpload(e: React.FormEvent) {
-    e.preventDefault()
+  async function handleUpload(file: File) {
+    if (!docType) {
+      setError('Selecione o tipo de documento')
+      return
+    }
+
     setLoading(true)
     setError(null)
 
     try {
+      const formData = new FormData()
+      formData.append('file', file)
+      formData.append('type', docType)
+
       const res = await fetch('/api/v1/kyc/documents', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ type: docType }),
+        body: formData,
       })
 
       if (res.ok) {
         const data = await res.json()
         setDocuments([data.data, ...documents])
         setDocType('')
-        setShowUpload(false)
       } else {
         const err = await res.json()
         setError(err.error || 'Erro ao enviar documento')
@@ -126,29 +132,22 @@ export default function KycPage() {
         <Card variant="elevated" className="p-6">
           <div className="flex items-center justify-between mb-4">
             <h2 className="font-display font-bold text-text">Documentos</h2>
-            <Button onClick={() => setShowUpload(!showUpload)} size="sm" disabled={loading}>
-              {showUpload ? 'Cancelar' : '+ Enviar Documento'}
-            </Button>
           </div>
 
-          {showUpload && (
-            <form onSubmit={handleUpload} className="space-y-4 mb-6 pb-6 border-b border-white/5">
-              <select
-                value={docType}
-                onChange={(e) => setDocType(e.target.value)}
-                className="w-full px-4 py-2.5 bg-surface border border-white/10 rounded-md text-text focus:outline-none focus:border-primary"
-                required
-              >
-                <option value="">Selecione o tipo de documento</option>
-                <option value="identity">Identidade (RG/CPF)</option>
-                <option value="proof_of_address">Comprovante de Residência</option>
-                <option value="business">Documento Empresarial (CNPJ)</option>
-              </select>
-              <Button type="submit" loading={loading}>
-                Enviar
-              </Button>
-            </form>
-          )}
+          <div className="space-y-4 mb-6 pb-6 border-b border-white/5">
+            <select
+              value={docType}
+              onChange={(e) => setDocType(e.target.value)}
+              className="w-full px-4 py-2.5 bg-surface border border-white/10 rounded-md text-text focus:outline-none focus:border-primary"
+              required
+            >
+              <option value="">Selecione o tipo de documento</option>
+              <option value="identity">Identidade (RG/CPF)</option>
+              <option value="proof_of_address">Comprovante de Residência</option>
+              <option value="business">Documento Empresarial (CNPJ)</option>
+            </select>
+            <FileUpload onUpload={handleUpload} accept="image/*,.pdf" label="Selecionar arquivo" loading={loading} />
+          </div>
 
           {fetchLoading ? (
             <div className="space-y-3">
