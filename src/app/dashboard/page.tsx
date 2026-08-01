@@ -25,8 +25,8 @@ export default function DashboardPage() {
         setError(null)
 
         const [balanceRes, transactionsRes] = await Promise.all([
-          fetch('/api/v1/balance'),
-          fetch('/api/v1/transactions?page=1&limit=10'),
+          fetch('/api/v1/balance', { credentials: 'same-origin' }),
+          fetch('/api/v1/transactions?page=1&limit=10', { credentials: 'same-origin' }),
         ])
 
         if (!balanceRes.ok || !transactionsRes.ok) {

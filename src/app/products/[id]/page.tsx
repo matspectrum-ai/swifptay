@@ -31,7 +31,7 @@ export default function ProductDetailPage({ params }: { params: { id: string } }
   useEffect(() => {
     if (!session?.user?.id) return
     setLoading(true)
-    fetch(`/api/v1/products/${params.id}`)
+    fetch(`/api/v1/products/${params.id}`, { credentials: 'same-origin' })
       .then((res) => res.ok ? res.json() : Promise.reject())
       .then((data) => setProduct(data.data))
       .catch(() => router.push('/products'))

@@ -28,7 +28,7 @@ export default function ApiKeysPage() {
   useEffect(() => {
     if (!session?.user?.id) return
     setLoading(true)
-    fetch('/api/v1/api-keys')
+    fetch('/api/v1/api-keys', { credentials: 'same-origin' })
       .then((res) => res.ok ? res.json() : Promise.reject())
       .then((data) => setApiKeys(data.data || []))
       .catch(() => {})
@@ -39,7 +39,7 @@ export default function ApiKeysPage() {
     e.preventDefault()
     setCreating(true)
     try {
-      const res = await fetch('/api/v1/api-keys', {
+      const res = await fetch('/api/v1/api-keys', { credentials: 'same-origin', 
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ name }),
@@ -55,7 +55,7 @@ export default function ApiKeysPage() {
   }
 
   async function handleDelete(id: string) {
-    await fetch(`/api/v1/api-keys/${id}`, { method: 'DELETE' })
+    await fetch(`/api/v1/api-keys/${id}`, { method: 'DELETE', credentials: 'same-origin' })
     setApiKeys(apiKeys.filter((k) => k.id !== id))
   }
 

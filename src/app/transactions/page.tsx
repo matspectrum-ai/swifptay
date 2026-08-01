@@ -36,7 +36,7 @@ export default function TransactionsPage() {
     if (typeFilter) params.set('type', typeFilter)
 
     setLoading(true)
-    fetch(`/api/v1/transactions?${params.toString()}`)
+    fetch(`/api/v1/transactions?${params.toString()}`, { credentials: 'same-origin' })
       .then((res) => {
         if (!res.ok) throw new Error('Failed to fetch transactions')
         return res.json()

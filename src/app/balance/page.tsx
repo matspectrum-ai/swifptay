@@ -22,7 +22,7 @@ export default function BalancePage() {
   useEffect(() => {
     if (!session?.user?.id) return
 
-    fetch('/api/v1/balance')
+    fetch('/api/v1/balance', { credentials: 'same-origin' })
       .then((res) => {
         if (!res.ok) throw new Error('Failed to fetch balance')
         return res.json()

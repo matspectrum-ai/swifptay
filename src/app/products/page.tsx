@@ -37,7 +37,7 @@ export default function ProductsPage() {
     if (!session?.user?.id) return
 
     setLoading(true)
-    fetch('/api/v1/products')
+    fetch('/api/v1/products', { credentials: 'same-origin' })
       .then((res) => {
         if (!res.ok) throw new Error('Failed to fetch products')
         return res.json()
@@ -53,7 +53,7 @@ export default function ProductsPage() {
     setError(null)
 
     try {
-      const res = await fetch('/api/v1/products', {
+      const res = await fetch('/api/v1/products', { credentials: 'same-origin', 
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -85,7 +85,7 @@ export default function ProductsPage() {
 
   async function handleDelete(id: string) {
     try {
-      const res = await fetch(`/api/v1/products/${id}`, { method: 'DELETE' })
+      const res = await fetch(`/api/v1/products/${id}`, { credentials: 'same-origin', method: 'DELETE' })
       if (res.ok) {
         setProducts(products.filter((p) => p.id !== id))
       } else {
@@ -99,7 +99,7 @@ export default function ProductsPage() {
 
   async function handleToggle(id: string, currentStatus: boolean) {
     try {
-      const res = await fetch(`/api/v1/products/${id}`, {
+      const res = await fetch(`/api/v1/products/${id}`, { credentials: 'same-origin', 
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ isActive: !currentStatus }),

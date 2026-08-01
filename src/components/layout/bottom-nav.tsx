@@ -4,19 +4,17 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import {
   LayoutDashboard,
-  Package,
+  Link as LinkIcon,
+  Receipt,
   Wallet,
-  CreditCard,
-  Bell,
   Settings,
 } from 'lucide-react'
 
 const navItems = [
-  { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
-  { href: '/products', label: 'Produtos', icon: Package },
-  { href: '/checkout', label: 'Receber', icon: Wallet },
-  { href: '/balance', label: 'Saldo', icon: CreditCard },
-  { href: '/notifications', label: 'Notifs', icon: Bell },
+  { href: '/dashboard', label: 'Início', icon: LayoutDashboard },
+  { href: '/checkout', label: 'Link', icon: LinkIcon },
+  { href: '/transactions', label: 'Transações', icon: Receipt },
+  { href: '/balance', label: 'Saldo', icon: Wallet },
   { href: '/settings', label: 'Ajustes', icon: Settings },
 ]
 

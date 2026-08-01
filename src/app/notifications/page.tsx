@@ -49,7 +49,7 @@ export default function NotificationsPage() {
     if (!session?.user?.id) return
 
     setLoading(true)
-    fetch('/api/v1/notifications')
+    fetch('/api/v1/notifications', { credentials: 'same-origin' })
       .then((res) => {
         if (!res.ok) throw new Error('Failed to fetch notifications')
         return res.json()
@@ -65,7 +65,7 @@ export default function NotificationsPage() {
   async function markAsRead(id: string) {
     setMarkingRead(id)
     try {
-      await fetch(`/api/v1/notifications/${id}/read`, { method: 'PATCH' })
+      await fetch(`/api/v1/notifications/${id}/read`, { method: 'PATCH', credentials: 'same-origin' })
       setNotifications(notifications.map((n) => (n.id === id ? { ...n, read: true } : n)))
       setUnreadCount((prev) => Math.max(0, prev - 1))
     } catch {
@@ -77,7 +77,7 @@ export default function NotificationsPage() {
 
   async function markAllAsRead() {
     try {
-      await fetch('/api/v1/notifications/read-all', { method: 'PATCH' })
+      await fetch('/api/v1/notifications/read-all', { method: 'PATCH', credentials: 'same-origin' })
       setNotifications(notifications.map((n) => ({ ...n, read: true })))
       setUnreadCount(0)
     } catch {

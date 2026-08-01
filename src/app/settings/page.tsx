@@ -21,7 +21,7 @@ export default function SettingsPage() {
     e.preventDefault()
     setSaving(true)
     try {
-      await fetch('/api/v1/user', {
+      await fetch('/api/v1/user', { credentials: 'same-origin', 
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ name }),

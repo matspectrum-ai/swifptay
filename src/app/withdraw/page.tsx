@@ -32,7 +32,7 @@ export default function WithdrawPage() {
     if (!session?.user?.id) return
 
     setHistoryLoading(true)
-    fetch('/api/v1/withdrawals')
+    fetch('/api/v1/withdrawals', { credentials: 'same-origin' })
       .then((res) => {
         if (!res.ok) throw new Error('Failed to fetch withdrawals')
         return res.json()
@@ -48,7 +48,7 @@ export default function WithdrawPage() {
     setError(null)
 
     try {
-      const res = await fetch('/api/v1/withdrawals', {
+      const res = await fetch('/api/v1/withdrawals', { credentials: 'same-origin', 
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

@@ -31,7 +31,7 @@ export default function KycPage() {
     if (!session?.user?.id) return
 
     setFetchLoading(true)
-    fetch('/api/v1/kyc')
+    fetch('/api/v1/kyc', { credentials: 'same-origin' })
       .then((res) => {
         if (!res.ok) throw new Error('Failed to fetch KYC')
         return res.json()

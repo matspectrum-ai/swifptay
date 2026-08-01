@@ -29,7 +29,7 @@ export default function WebhooksPage() {
   useEffect(() => {
     if (!session?.user?.id) return
     setLoading(true)
-    fetch('/api/v1/webhooks')
+    fetch('/api/v1/webhooks', { credentials: 'same-origin' })
       .then((res) => res.ok ? res.json() : Promise.reject())
       .then((data) => setWebhooks(data.data || []))
       .catch(() => {})
@@ -40,7 +40,7 @@ export default function WebhooksPage() {
     e.preventDefault()
     setCreating(true)
     try {
-      const res = await fetch('/api/v1/webhooks', {
+      const res = await fetch('/api/v1/webhooks', { credentials: 'same-origin', 
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ url, events: events.split(',').map((e) => e.trim()) }),
@@ -56,7 +56,7 @@ export default function WebhooksPage() {
   }
 
   async function handleDelete(id: string) {
-    await fetch(`/api/v1/webhooks/${id}`, { method: 'DELETE' })
+    await fetch(`/api/v1/webhooks/${id}`, { method: 'DELETE', credentials: 'same-origin' })
     setWebhooks(webhooks.filter((w) => w.id !== id))
   }
 

@@ -76,7 +76,7 @@ export default function CheckoutPage() {
   return (
     <DashboardLayout>
       <div className="max-w-lg mx-auto space-y-6">
-        <h1 className="font-display font-bold text-2xl text-text">Receber Pix</h1>
+        <h1 className="font-display font-bold text-2xl text-text">Link de Pagamento</h1>
 
         {error && (
           <div className="bg-red-500/10 border border-red-500/20 rounded-lg p-4">

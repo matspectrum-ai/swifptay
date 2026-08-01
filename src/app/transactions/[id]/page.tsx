@@ -37,7 +37,7 @@ export default function TransactionDetailPage({ params }: { params: { id: string
   useEffect(() => {
     if (!session?.user?.id) return
     setLoading(true)
-    fetch(`/api/v1/transactions/${params.id}`)
+    fetch(`/api/v1/transactions/${params.id}`, { credentials: 'same-origin' })
       .then((res) => res.ok ? res.json() : Promise.reject())
       .then((data) => setTransaction(data.data))
       .catch(() => router.push('/transactions'))
