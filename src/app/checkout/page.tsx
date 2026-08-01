@@ -50,7 +50,7 @@ export default function CheckoutPage() {
           parseFloat(amount),
           'SwiftPay',
           'São Paulo',
-          data.data?.id
+          data.data?.id || data.data?.transactionId || data.data?.id
         )
         const qrDataUrl = await QRCode.toDataURL(payload, {
           width: 300,

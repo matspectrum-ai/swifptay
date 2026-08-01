@@ -101,6 +101,7 @@ model Charge {
   pixKey               String
   status               ChargeStatus @default(PENDING)
   openpixTransactionId String?
+  providerTransactionId String?
   qrCodeUrl            String?
   expiresAt            DateTime
   createdAt            DateTime @default(now())
@@ -155,6 +156,8 @@ model Provider {
   id          String   @id @default(uuid())
   name        String
   apiKey      String
+  publicKey   String?
+  secretKey   String?
   baseUrl     String
   status      ProviderStatus @default(ACTIVE)
   priority    Int

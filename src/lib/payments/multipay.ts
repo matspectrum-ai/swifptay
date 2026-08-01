@@ -1,5 +1,6 @@
 import { PixProvider } from './types'
 import { OpenPixAdapter } from './openpix'
+import { PagouAdapter } from './pagou'
 import { prisma } from '@/lib/prisma/client'
 
 export class MultiPay {
@@ -17,6 +18,14 @@ export class MultiPay {
       switch (provider.name.toLowerCase()) {
         case 'openpix':
           adapter = new OpenPixAdapter(provider.apiKey, provider.baseUrl)
+          break
+        case 'pagou':
+        case 'akkadpag':
+          adapter = new PagouAdapter(
+            provider.publicKey,
+            provider.secretKey,
+            provider.baseUrl
+          )
           break
         default:
           continue
