@@ -24,38 +24,29 @@ export class PagouAdapter implements PixProvider {
 
     const payload: Record<string, unknown> = {
       amount: amountInCents,
-      payment_method: 'pix',
-      pix_key: pixKey,
-    }
-
-    if (metadata?.external_ref) {
-      payload.external_ref = metadata.external_ref
-    }
-
-    if (metadata?.buyer_name) {
-      payload.customer = {
-        name: metadata.buyer_name as string,
-        email: metadata.buyer_email as string | undefined,
-        phone: metadata.buyer_phone as string | undefined,
-        document: metadata.buyer_document
+      payment_method: 'PIX',
+      customer: {
+        name: metadata?.buyer_name as string | undefined,
+        email: metadata?.buyer_email as string | undefined,
+        document: metadata?.buyer_document
           ? {
               type: 'CPF',
               number: String(metadata.buyer_document),
             }
           : undefined,
-      }
+      },
+      items: [
+        {
+          title: metadata?.product_name as string | undefined || 'Produto',
+          unit_price: amountInCents,
+          quantity: 1,
+          tangible: false,
+        },
+      ],
     }
 
-    if (metadata?.items) {
-      payload.items = metadata.items
-    }
-
-    if (metadata?.expires_in) {
-      payload.expires_in = metadata.expires_in
-    }
-
-    if (metadata?.postback_url) {
-      payload.postback_url = metadata.postback_url
+    if (metadata?.external_ref) {
+      payload.external_ref = metadata.external_ref
     }
 
     const response = await fetch(`${this.baseUrl}/transactions`, {
@@ -75,18 +66,16 @@ export class PagouAdapter implements PixProvider {
     const data = await response.json()
     const transaction = data.data || data
 
-    if (!transaction?.pix?.copy_paste && !transaction?.pix?.qr_code) {
+    if (!transaction?.pix?.copy_paste) {
       throw new Error('AKKADPAG response missing Pix QR code')
     }
 
     return {
-      transactionId: String(transaction.id || transaction.transaction_id),
-      qrCodeUrl: transaction.pix.qr_code || transaction.pix.copy_paste || '',
+      transactionId: String(transaction.id),
+      qrCodeUrl: transaction.pix.copy_paste,
       expiresAt: transaction.pix.expires_at
         ? new Date(transaction.pix.expires_at)
-        : transaction.pix.expiration_date
-          ? new Date(transaction.pix.expiration_date)
-          : new Date(Date.now() + 24 * 60 * 60 * 1000),
+        : new Date(Date.now() + 24 * 60 * 60 * 1000),
     }
   }
 
@@ -102,9 +91,16 @@ export class PagouAdapter implements PixProvider {
       }
     }
 
-    const data = event.data || {}
-    const transactionId = data.transaction_id || data.id || ''
-    const status = data.status || data.event_type || event.event || event.event_type || 'UNKNOWN'
+    const data = event.data || (payload as Record<string, unknown>)
+    const transactionId =
+      String((data as { transaction_id?: unknown }).transaction_id || '') ||
+      String((data as { id?: unknown }).id || '')
+    const status =
+      String((data as { status?: unknown }).status || '') ||
+      String((data as { event_type?: unknown }).event_type || '') ||
+      event.event ||
+      event.event_type ||
+      'UNKNOWN'
 
     return {
       status: status.toUpperCase(),
